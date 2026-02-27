@@ -28,16 +28,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain doSecurityFilterChain(HttpSecurity http) throws Exception {
-//        CookieClearingLogoutHandler cookies = new CookieClearingLogoutHandler("refreshToken");
-
         return http
-//                .cors(c -> c.configurationSource(setCors()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/auth").permitAll();
-//                    req.requestMatchers(HttpMethod.GET, "/usuarios/cedentes/*", "/refresh-token", "/logout").permitAll();
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     req.anyRequest().authenticated();
                 })

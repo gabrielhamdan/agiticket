@@ -26,7 +26,7 @@ public class SpringDocConfig {
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title("AgiTicket REST API")
-                        .description("RESTful API for ticket lifecycle management with role-based access control")
+                        .description("API REST para gerenciamento de chamados com controle de acesso baseado em permissão de usuário")
                         .version("1.0").contact(new Contact().name("Gabriel Hamdan")
                                 .email( "gabriel_hamdan@hotmail.com").url("https://www.linkedin.com/in/gabriel-hamdan/"))
                         .license(new License().name("MIT License")

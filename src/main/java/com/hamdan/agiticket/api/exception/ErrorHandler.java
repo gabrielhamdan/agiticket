@@ -33,12 +33,12 @@ public class ErrorHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiErrDto> handleErr404(EntityNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrDto(HttpStatus.NOT_FOUND.value(), "Não encontrado."));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrDto(HttpStatus.NOT_FOUND.value(), "Entidade não encontrada."));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiErrDto> handleErr404(NoResourceFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrDto(HttpStatus.NOT_FOUND.value(), "Não encontrado."));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrDto(HttpStatus.NOT_FOUND.value(), "Recurso não encontrado."));
     }
 
     @ExceptionHandler(Exception.class)

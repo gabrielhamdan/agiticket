@@ -1,4 +1,4 @@
-package com.hamdan.agiticket.api.misc;
+package com.hamdan.agiticket.api.response;
 
 import org.springframework.http.HttpStatus;
 

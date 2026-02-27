@@ -1,9 +1,11 @@
 package com.hamdan.agiticket.domain.user;
 
+import com.hamdan.agiticket.api.exception.ApiAssert;
 import com.hamdan.agiticket.api.exception.ApiErrorException;
 import com.hamdan.agiticket.api.exception.EApiErrorMessage;
+import com.hamdan.agiticket.api.response.ApiPaginationDto;
+import com.hamdan.agiticket.domain.user.permission.EUserRole;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +23,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void createUser(NewUserDto newUserDto) {
+    public UserDataDto createUser(NewUserDto newUserDto) {
         var user = userRepository.findByUserName(newUserDto.userName());
 
         if (user != null)
@@ -29,29 +31,36 @@ public class UserService {
 
         user = User.from(newUserDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        return new UserDataDto(user);
     }
 
-    public Page<UserDataDto> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable).map(UserDataDto::new);
+    public ApiPaginationDto<UserDataDto> findAll(Pageable pageable) {
+        var page = userRepository.findAll(pageable);
+
+        return new ApiPaginationDto<>(page, UserDataDto::new);
     }
 
     public UserDataDto findUser(Long id) {
-        return new UserDataDto(findUserById(id));
+        return new UserDataDto(findUserByIdOrElseThrow(id));
     }
 
-    public UserDataDto updateUser(UserUpdateDataDto userUpdateDataDto) {
-        var user = findUserById(userUpdateDataDto.id());
+    public UserDataDto updateUser(User authPrincipal, UserUpdateDataDto userUpdateDataDto) {
+        var user = findUserByIdOrElseThrow(userUpdateDataDto.id());
+
+        if (!authPrincipal.equals(user))
+            ApiAssert.isTrue(authPrincipal.getUserRole().equals(EUserRole.ADMIN));
 
         if (userUpdateDataDto.newPassword() != null) {
-            if (!passwordEncoder.matches(userUpdateDataDto.password(), user.getPassword()))
+            if (!passwordEncoder.matches(userUpdateDataDto.password(), user.getPassword()) && !authPrincipal.getUserRole().equals(EUserRole.ADMIN))
                 throw new ApiErrorException(HttpStatus.UNAUTHORIZED, EApiErrorMessage.INCORRECT_PASSWORD);
+
             user.setPassword(passwordEncoder.encode(userUpdateDataDto.newPassword()));
         }
 
         if (userUpdateDataDto.role() != null && !userUpdateDataDto.role().equals(user.getUserRole())) {
-            if (!user.getUserRole().isUserAdmin())
-                throw new ApiErrorException(HttpStatus.UNAUTHORIZED, "Sem permissão para alterar privilégio.");
+            ApiAssert.isTrue(authPrincipal.getUserRole().isUserAdmin(), () -> new ApiErrorException(HttpStatus.FORBIDDEN, "Sem permissão para alterar privilégio."));
 
             user.setUserRole(userUpdateDataDto.role());
         }
@@ -62,13 +71,17 @@ public class UserService {
     }
 
     public void toggleUser(Long id) {
-        var user = findUserById(id);
+        var user = findUserByIdOrElseThrow(id);
         user.setUserEnabled(!user.isUserEnabled());
         userRepository.save(user);
     }
 
-    private User findUserById(Long id) {
+    public User findUserByIdOrElseThrow(Long id) {
         return userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public User findUserByIdOrElseNull(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
 }

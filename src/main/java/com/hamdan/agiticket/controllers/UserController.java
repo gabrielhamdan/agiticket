@@ -1,19 +1,17 @@
 package com.hamdan.agiticket.controllers;
 
-import com.hamdan.agiticket.api.misc.ApiResponseDto;
-import com.hamdan.agiticket.domain.user.NewUserDto;
-import com.hamdan.agiticket.domain.user.UserDataDto;
-import com.hamdan.agiticket.domain.user.UserService;
-import com.hamdan.agiticket.domain.user.UserUpdateDataDto;
+import com.hamdan.agiticket.api.response.ApiPaginationDto;
+import com.hamdan.agiticket.api.response.ApiResponseDto;
+import com.hamdan.agiticket.domain.user.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,27 +28,28 @@ public class UserController {
     @PostMapping
     @Operation(summary = "Este método permite que um usuário ADMIN crie um novo usuário no sistema.")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponseDto> createUser(@RequestBody @Valid NewUserDto newUserDto) {
-        userService.createUser(newUserDto);
-        return ResponseEntity.ok(new ApiResponseDto(HttpStatus.ACCEPTED, "Usuário criado com sucesso."));
+    public ResponseEntity<UserDataDto> createUser(@RequestBody @Valid NewUserDto newUserDto) {
+        return ResponseEntity.ok(userService.createUser(newUserDto));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Este método pesquisa um usuário por ID.")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDataDto> findUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findUser(id));
     }
 
     @GetMapping
     @Operation(summary = "Este método lista todos os usuários do sistema.")
-    public ResponseEntity<Page<UserDataDto>> findAllUsers(@PageableDefault(size = 10, sort = {"userName"}) Pageable pageable) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiPaginationDto<UserDataDto>> findAllUsers(@PageableDefault(sort = {"userName"}) Pageable pageable) {
         return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @PutMapping
     @Operation(summary = "Este método permite alterar usuários do sistema.")
-    public ResponseEntity<UserDataDto> updateUser(@RequestBody @Valid UserUpdateDataDto userUpdateDataDto) {
-        return ResponseEntity.ok(userService.updateUser(userUpdateDataDto));
+    public ResponseEntity<UserDataDto> updateUser(@AuthenticationPrincipal User user, @RequestBody @Valid UserUpdateDataDto userUpdateDataDto) {
+        return ResponseEntity.ok(userService.updateUser(user, userUpdateDataDto));
     }
 
     @PutMapping("/{id}")

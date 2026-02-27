@@ -1,7 +1,5 @@
 package com.hamdan.agiticket.domain.user.permission;
 
-import java.util.Objects;
-
 public enum EUserRole {
 
     ADMIN,

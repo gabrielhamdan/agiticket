@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.hamdan.agiticket.domain.user.User;
 import com.hamdan.agiticket.domain.user.auth.TokenDto;
 import com.hamdan.agiticket.api.exception.ApiErrorException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,8 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-//    @Value("${api.security.token.secret}")
-    // FIXME proper secret
-    public static final String SECRET = "teste123";
+    @Value("${api.security.jwt.secret}")
+    public static String SECRET;
 
     public static final int TOKEN_DURATION = 60 * 15;
     public static final String TOKEN_ISSUER = "AgiTicket API";
