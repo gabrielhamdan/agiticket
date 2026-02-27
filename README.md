@@ -22,8 +22,6 @@ The system is centered around three main entities:
 - `TECH`
 - `USER`
 
-Authorization is enforced both at endpoint level and within service-layer business rules.
-
 ---
 
 ## Business Rules
@@ -49,8 +47,8 @@ Authorization is enforced both at endpoint level and within service-layer busine
 - Stateless authentication using JWT.
 - Custom `OncePerRequestFilter` for token validation.
 - Role-based access control using:
-  - Coarse-grained authorization with `@PreAuthorize` at controller level
-  - Fine-grained business rule validation in the service layer based on the authenticated principal
+  - Endpoint-level authorization with @PreAuthorize
+  - Domain-level rule enforcement in the service layer
 - Password encryption with BCrypt.
 
 ---
@@ -95,17 +93,9 @@ domain/
 
 ---
 
-## Running the Application
-
-### Requirements
-
-- Java 21
-- PostgreSQL
-
----
-
 ## Technical Stack
 
+- Java 21
 - Spring Boot
 - Spring Data JPA
 - Spring Security
@@ -113,6 +103,24 @@ domain/
 - Flyway
 - PostgreSQL
 - Lombok
+
+---
+
+## Deployment
+
+The application is deployed on Render using Docker.
+
+- **Cloud Platform:** Render
+- **Database:** Managed PostgreSQL (Render)
+- **Containerization:** Docker (multi-stage build)
+- **Environment Variables:** Configured via Render dashboard
+- **Migrations:** Flyway executed automatically on startup
+
+### Live API
+
+**Base URL:** https://agiticket.onrender.com
+
+### [API Documentation (Swagger UI)](https://agiticket.onrender.com/api/v1/swagger-ui/index.html)
 
 ---
 
