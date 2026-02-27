@@ -28,8 +28,8 @@ public class UserController {
     @PostMapping
     @Operation(summary = "Este método permite que um usuário ADMIN crie um novo usuário no sistema.")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserDataDto> createUser(@RequestBody @Valid NewUserDto newUserDto) {
-        return ResponseEntity.ok(userService.createUser(newUserDto));
+    public ResponseEntity<UserDataDto> createUser(@AuthenticationPrincipal User user, @RequestBody @Valid NewUserDto newUserDto) {
+        return ResponseEntity.ok(userService.createUser(user, newUserDto));
     }
 
     @GetMapping("/{id}")
@@ -55,8 +55,8 @@ public class UserController {
     @PutMapping("/{id}")
     @Operation(summary = "Este método permite que um usuário ADMIN ative/desative usuários do sistema.")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponseDto> toggleUser(@PathVariable Long id) {
-        userService.toggleUser(id);
+    public ResponseEntity<ApiResponseDto> toggleUser(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        userService.toggleUser(user, id);
         return ResponseEntity.ok(new ApiResponseDto(HttpStatus.OK, "Usuário alterado com sucesso."));
     }
 

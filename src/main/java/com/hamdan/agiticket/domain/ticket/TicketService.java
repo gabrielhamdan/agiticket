@@ -7,12 +7,14 @@ import com.hamdan.agiticket.domain.user.User;
 import com.hamdan.agiticket.domain.user.UserService;
 import com.hamdan.agiticket.domain.user.permission.EUserRole;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class TicketService {
 
@@ -40,6 +42,8 @@ public class TicketService {
         }
 
         ticket = ticketRepository.save(ticket);
+
+        log.info("Ticket {} created by user {}", ticket.getId(), author.getId());
 
         return new TicketDataDto(ticket);
     }
@@ -105,12 +109,14 @@ public class TicketService {
         return new TicketDataDto(ticket);
     }
 
-    public TicketDataDto reopenTicket(Long id) {
+    public TicketDataDto reopenTicket(User authPrincipal, Long id) {
         var ticket = findTicketByIdOrElseThrow(id);
 
         ticket.setStatus(ETickeStatus.OPEN);
 
         ticket = ticketRepository.save(ticket);
+
+        log.info("User {} reopened ticket {}", authPrincipal.getId(), ticket.getId());
 
         return new TicketDataDto(ticket);
     }

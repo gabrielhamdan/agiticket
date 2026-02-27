@@ -16,13 +16,18 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    @Value("${api.security.jwt.secret}")
-    public static String SECRET;
+    public final Algorithm ALGORITHM;
 
     public static final int TOKEN_DURATION = 60 * 15;
+
     public static final String TOKEN_ISSUER = "AgiTicket API";
+
     public static final ZoneOffset ZONE_OFFSET = ZoneOffset.of("-03:00");
-    public static final Algorithm ALGORITHM = Algorithm.HMAC256(SECRET);
+
+
+    public TokenService(@Value("${api.security.jwt.secret}") String secret) {
+        ALGORITHM = Algorithm.HMAC256(secret);
+    }
 
     public TokenDto issueToken(User user) {
         try {

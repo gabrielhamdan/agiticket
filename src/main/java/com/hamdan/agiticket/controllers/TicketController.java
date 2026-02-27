@@ -60,8 +60,8 @@ public class TicketController {
     @PutMapping("/{id}")
     @Operation(summary = "Este método permite que um usuário ADMIN reabra um chamado.")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TicketDataDto> reopenTicket(@PathVariable Long id) {
-        return ResponseEntity.ok(ticketService.reopenTicket(id));
+    public ResponseEntity<TicketDataDto> reopenTicket(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        return ResponseEntity.ok(ticketService.reopenTicket(user, id));
     }
 
     @DeleteMapping("/{id}")

@@ -19,8 +19,11 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
 
-    public SecurityFilter(UserRepository userRepository) {
+    private final TokenService tokenService;
+
+    public SecurityFilter(UserRepository userRepository, TokenService tokenService) {
         this.userRepository = userRepository;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = TokenUtils.getToken(request);
 
         if (token != null) {
-            var userName = TokenUtils.getSubject(TokenService.ALGORITHM, TokenService.TOKEN_ISSUER, token);
+            var userName = TokenUtils.getSubject(tokenService.ALGORITHM, TokenService.TOKEN_ISSUER, token);
 
             var user = userRepository.findByUserName(userName);
 

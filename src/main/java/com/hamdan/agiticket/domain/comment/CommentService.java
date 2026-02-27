@@ -8,6 +8,7 @@ import com.hamdan.agiticket.domain.ticket.TicketRepository;
 import com.hamdan.agiticket.domain.user.User;
 import com.hamdan.agiticket.domain.user.permission.EUserRole;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class CommentService {
 
@@ -99,6 +101,8 @@ public class CommentService {
             ApiAssert.equals(comment.getAuthor(), user, () -> new ApiErrorException(HttpStatus.FORBIDDEN, "Usuário sem permissão para excluir o comentário."));
 
         commentRepository.delete(comment);
+
+        log.warn("Comment {} deleted by user {}", comment.getId(), user.getId());
     }
 
 }
